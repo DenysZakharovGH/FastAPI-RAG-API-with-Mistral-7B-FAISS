@@ -47,22 +47,6 @@ Answer + Sources
 
 ---
 
-## 📂 Project Structure
-
-```
-app/
-├── main.py          # FastAPI app & routes
-├── models.py        # Pydantic request/response models
-├── llm.py           # Mistral-7B model loading & generation
-├── prompts.py       # RAG prompt templates
-├── rag.py           # Retrieval + generation logic
-├── embeddings.py    # Text embeddings
-├── vector_store.py  # FAISS index & metadata handling
-└── data/            # Raw documents / datasets
-```
-
----
-
 ## 🔧 Requirements
 
 * Python **3.10+**
