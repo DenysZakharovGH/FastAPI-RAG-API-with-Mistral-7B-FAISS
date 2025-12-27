@@ -7,17 +7,16 @@ from typing import List
 
 from starlette.concurrency import run_in_threadpool
 
-from llm_1.llm import generate_answer
+from app.core.config import DATA_STORAGE
+from app.llm_1.llm import generate_answer
 
-index = faiss.read_index("data_storage/faiss_index.bin")
+index = faiss.read_index(F"{DATA_STORAGE}/faiss_index.bin")
 model = SentenceTransformer("all-MiniLM-L6-v2")
 # Metadata
 
-with open("data_storage/faiss_metadata.pkl", "rb") as f:
+with open(F"{DATA_STORAGE}/faiss_metadata.pkl", "rb") as f:
     metadata = pickle.load(f)
 
-# print("index", len(index))
-print("metadata", len(metadata))
 
 
 def get_context_data(query_text: str) -> (List[str], List[str]):
@@ -41,14 +40,17 @@ def get_context_data(query_text: str) -> (List[str], List[str]):
 def build_rag_prompt(context: str, question: str) -> str:
     return f"""
             <s>[INST]
-            You are a helpful assistant.
-            Answer the question ONLY using the provided context.
-            If the answer is not in the context, say "I don't know".
+            You are a highly knowledgeable assistant.
             
-            Context:
+            - ONLY use the information provided in the context!
+            - If the answer is not in the context, reply exactly with: "I don't know".
+            - Answer in one short, clear, and meaningful sentence.
+            - Do not add extra explanations, opinions, or information beyond the context.
+            
+            ### CONTEXT:
             {context}
             
-            Question:
+            ### QUESTION:
             {question}
             [/INST]
             """
@@ -60,7 +62,7 @@ def answer_with_rag(question: str,) -> (str, List[str]):
 
     return answer, source
 
-async def answer_with_rag_async(question: str,):
+async def answer_with_rag_async(question: str) -> (str, List[str]):
     context, source  = get_context_data(question)
     prompt = build_rag_prompt(context, question)
 

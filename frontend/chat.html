@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Local LLM Chat</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f7f7f8;
+        display: flex;
+        justify-content: center;
+        padding: 50px;
+    }
+    .chat-container {
+        width: 500px;
+        max-width: 90%;
+        background: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .messages {
+        max-height: 400px;
+        overflow-y: auto;
+        margin-bottom: 20px;
+    }
+    .message {
+        margin-bottom: 10px;
+        padding: 10px 15px;
+        border-radius: 15px;
+        display: inline-block;
+        max-width: 80%;
+        word-wrap: break-word;
+    }
+    .user {
+        background-color: #DCF8C6;
+        align-self: flex-end;
+    }
+    .bot {
+        background-color: #ECECEC;
+        align-self: flex-start;
+    }
+    input[type="text"] {
+        width: 80%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+    button {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        background-color: #0b93f6;
+        color: white;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #0a7ed1;
+    }
+</style>
+</head>
+<body>
+<div class="chat-container">
+    <div class="messages" id="messages"></div>
+    <div style="display: flex;">
+        <input type="text" id="question" placeholder="Type your question..." />
+        <button onclick="sendQuestion()">Send</button>
+    </div>
+</div>
+
+<script>
+async function sendQuestion() {
+    const questionInput = document.getElementById("question");
+    const messagesDiv = document.getElementById("messages");
+    const question = questionInput.value.trim();
+    if (!question) return;
+
+    // Add user message
+    const userMsg = document.createElement("div");
+    userMsg.className = "message user";
+    userMsg.textContent = question;
+    messagesDiv.appendChild(userMsg);
+
+    questionInput.value = "";
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    // Send request to FastAPI
+    try {
+        const response = await fetch("/ask", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ question })
+        });
+        const data = await response.json();
+
+        // Add bot message
+        const botMsg = document.createElement("div");
+        botMsg.className = "message bot";
+        botMsg.textContent = data.answer;
+        messagesDiv.appendChild(botMsg);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    } catch (error) {
+        console.error(error);
+        const botMsg = document.createElement("div");
+        botMsg.className = "message bot";
+        botMsg.textContent = "Error: Could not get response.";
+        messagesDiv.appendChild(botMsg);
+    }
+}
+</script>
+</body>
+</html>
