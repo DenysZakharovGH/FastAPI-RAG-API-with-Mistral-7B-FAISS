@@ -105,6 +105,9 @@ Content-Type: application/json
   ]
 }
 ```
+---
+
+[![Demo](docs/demo.gif)]
 
 ---
 

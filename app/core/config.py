@@ -12,7 +12,7 @@ FRONTEND_STORAGE = BASE_DIR / "frontend"
 
 class RunConfig(BaseModel):
     #host: str = "127.0.0.1"
-    host: str = "192.168.2.40"
+    host: str = "192.168.2.87"
     port: int = 8000
 
 class LLMConfig(BaseModel):
@@ -20,6 +20,7 @@ class LLMConfig(BaseModel):
     max_token_limits: int = 400
     treshold_answer_similarity: float = 0.5
     user_input_limits: int = 100
+    temperature: int = 0.7
 
 class Setting(BaseSettings):
     db_echo: bool = True  # settings variable to use for settings of our current DB
