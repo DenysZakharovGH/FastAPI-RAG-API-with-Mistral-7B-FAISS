@@ -11,8 +11,8 @@ DATA_STORAGE = PROJECT_ROOT / "data_storage"
 FRONTEND_STORAGE = BASE_DIR / "frontend"
 
 class RunConfig(BaseModel):
-    #host: str = "127.0.0.1"
-    host: str = "192.168.2.87"
+    host: str = "127.0.0.1"
+    #host: str = "192.168.2.87"
     port: int = 8000
 
 class LLMConfig(BaseModel):
