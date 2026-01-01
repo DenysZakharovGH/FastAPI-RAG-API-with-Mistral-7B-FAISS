@@ -1,0 +1,9 @@
+version: "3.9"
+
+services:
+  llm:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data_storage:/data_storage
