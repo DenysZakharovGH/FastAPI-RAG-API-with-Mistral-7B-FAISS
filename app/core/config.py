@@ -7,7 +7,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).parent.parent.parent
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-DATA_STORAGE = PROJECT_ROOT / "data_storage"
+DATA_STORAGE = BASE_DIR / "data_storage"
 FRONTEND_STORAGE = BASE_DIR / "frontend"
 
 class RunConfig(BaseModel):
