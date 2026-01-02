@@ -1,218 +1,209 @@
-# 🚀 FastAPI RAG API with Mistral-7B & FAISS
+# FastAPI RAG API with Mistral‑7B & FAISS
 
-A **production-ready Retrieval-Augmented Generation (RAG) API** built with **FastAPI**, **FAISS**, and **Mistral-7B-Instruct**.
+A **production‑ready Retrieval‑Augmented Generation (RAG) API** built with **FastAPI**, **FAISS**, and **Mistral‑7B‑Instruct**. This project lets you query your own documents through an HTTP API while ensuring answers are grounded strictly in retrieved context.
 
-This project demonstrates how to build a **controlled, async-safe LLM backend** that answers questions **only from your own data**, minimizing hallucinations while keeping latency and costs under control.
-
----
-
-## ✨ Features
-
-* ⚡ **FastAPI (ASGI)** — high-performance async web framework
-* 🧠 **Mistral-7B-Instruct** — powerful open-weight LLM
-* 🔍 **FAISS Vector Database** — fast cosine similarity search
-* 🧩 **Complete RAG pipeline**
-
-  * ingestion
-  * chunking
-  * embeddings
-  * retrieval
-  * generation
-* 🧵 **Async-safe LLM execution** using `run_in_threadpool`
-* 📦 **Metadata support** (source, document info per chunk)
-* 🛡️ **Hallucination control** (answers only from retrieved context)
-* 📏 **Token-aware prompt construction**
-* 🔄 **Background tasks** for logging
-* 🐳 **Docker-ready architecture**
+> 🎯 **Goal:** Provide fast, accurate, and source‑aware answers from custom datasets with minimal hallucinations.
 
 ---
 
-## 🏗️ Architecture
+## 🚀 Key Features
+
+- ⚡ **FastAPI** – High‑performance, async REST API
+- 🧠 **Mistral‑7B‑Instruct** – Open‑weight LLM for generation
+- 🔍 **FAISS Vector Store** – Fast similarity search at scale
+- 🧩 **Retrieval‑Augmented Generation (RAG)** – Answers based only on retrieved context
+- 📚 **Source Attribution** – Responses include supporting document chunks
+- 🐳 **Docker & Docker Compose** – Easy local and server deployment
+- 🔄 **Async‑Safe Inference** – Non‑blocking LLM execution
+- 🔧 **Configurable Pipeline** – Chunking, embeddings, and model settings
+
+---
+
+## 🏗️ Architecture Overview
 
 ```
-Client
-  ↓
-FastAPI (async)
-  ↓
-Pydantic Validation
-  ↓
+User Query
+   ↓
+FastAPI Endpoint
+   ↓
+Embedding Model
+   ↓
 FAISS Similarity Search
-  ↓
+   ↓
+Relevant Context Chunks
+   ↓
 RAG Prompt Assembly
-  ↓
-Mistral-7B-Instruct
-  ↓
+   ↓
+Mistral‑7B‑Instruct
+   ↓
 Answer + Sources
 ```
 
+### How It Works
+
+1. **Documents are ingested** and split into chunks
+2. **Embeddings** are generated for each chunk
+3. Chunks are stored in **FAISS** for fast retrieval
+4. A user query is embedded and matched against FAISS
+5. Top‑K relevant chunks are injected into a **RAG prompt**
+6. **Mistral‑7B** generates an answer strictly from context
+7. API returns the answer **with sources**
+
 ---
 
-## 🔧 Requirements
+## 📁 Project Structure
 
-* Python **3.10+**
-* GPU recommended (**≥ 8GB VRAM**)
-* Linux / Windows / macOS
-
-### Python dependencies
-
-```bash
-pip install -r requirements.txt
+```
+.
+├── app/                # FastAPI application logic
+│   ├── api/            # API routes
+│   ├── core/           # Configuration & settings
+│   ├── rag/            # RAG pipeline (retrieval, prompts, generation)
+│   └── models/         # Request/response schemas
+├── data_storage/       # FAISS indexes and persisted data
+├── docs/               # Additional documentation
+├── frontend/           # (Optional) UI for querying the API
+├── tests/              # Test suite
+├── Dockerfile
+├── docker-compose.yml
+└── README.md
 ```
 
-Main libraries:
+---
 
-* `fastapi`
-* `uvicorn`
-* `torch`
-* `transformers`
-* `faiss-cpu` or `faiss-gpu`
-* `sentence-transformers`
+## 📦 Installation
+
+### Option 1: Docker (Recommended)
+
+```bash
+git clone https://github.com/DenysZakharovGH/FastAPI-RAG-API-with-Mistral-7B-FAISS.git
+cd FastAPI-RAG-API-with-Mistral-7B-FAISS
+docker-compose up --build
+```
+
+The API will be available at:
+```
+http://localhost:8000
+[![Demo](docs/demo.gif)]
+
+```
 
 ---
 
-## ▶️ Running the API
+### Option 2: Local Setup
 
 ```bash
+git clone https://github.com/DenysZakharovGH/FastAPI-RAG-API-with-Mistral-7B-FAISS.git
+cd FastAPI-RAG-API-with-Mistral-7B-FAISS
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-Open API docs:
-
-👉 [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-
 ---
 
-## 📤 Example Request
+## 🔌 API Usage
 
-```http
+### Ask a Question
+
+**Endpoint**
+```
 POST /ask
-Content-Type: application/json
+```
 
+**Request Body**
+```json
 {
-  "question": "Length of a giraffe tongue?"
+  "question": "What is the length of a giraffe's tongue?"
 }
 ```
 
-### 📥 Example Response
-
+**Response**
 ```json
 {
-  "answer": "The length of a giraffe's tongue can measure between 18 to 20 inches.",
+  "answer": "A giraffe's tongue typically measures between 18 and 20 inches in length.",
   "sources": [
-    "The giraffes tongue is about 18 inches long",
-    "giraffes have a 17 inch long tongue",
-    "A giraffes tongue can measure 20 inches in length"
+    {
+      "content": "Giraffe tongues can reach up to 20 inches...",
+      "metadata": {
+        "source": "animals.txt"
+      }
+    }
   ]
 }
 ```
----
-
-[![Demo](docs/demo.gif)]
 
 ---
 
-## 🧠 RAG Pipeline Explained
+## 🧠 Hallucination Control
 
-### 1️⃣ Ingestion
+This project is designed to **minimize hallucinations**:
 
-Load raw documents and store their source information.
-
-### 2️⃣ Chunking
-
-Split documents into **300–500 token chunks** with overlap.
-
-### 3️⃣ Embeddings
-
-Convert text chunks into vectors using a sentence embedding model.
-
-### 4️⃣ Vector Database
-
-Store embeddings in **FAISS** for fast similarity search.
-
-### 5️⃣ Retrieval
-
-Search for **top-k most similar chunks** using cosine similarity.
-
-### 6️⃣ Prompt Assembly
-
-Inject retrieved context into an instruction-based prompt.
-
-### 7️⃣ Generation
-
-Generate an answer using **Mistral-7B-Instruct**.
+- The model is instructed to answer **only from provided context**
+- If no relevant context is found, the model responds accordingly
+- Prompt templates explicitly restrict speculative answers
 
 ---
 
-## 🛡️ Hallucination Control
+## ⚙️ Configuration
 
-The model is explicitly instructed:
+Most settings can be configured via environment variables or config files:
 
-> *If the answer is not in the provided context, say "I don't know".*
-
-Additional safety:
-
-* limited context window
-* source-aware responses
-* optional similarity confidence threshold
+- Embedding model
+- Chunk size & overlap
+- FAISS index type
+- Number of retrieved chunks (Top‑K)
+- LLM generation parameters (temperature, max tokens)
 
 ---
 
-## 🧵 Async-Safe LLM Execution
-
-LLM inference is **blocking**, so it is executed safely using:
-
-```python
-await run_in_threadpool(generate_answer, prompt)
-```
-
-This prevents blocking the FastAPI event loop and allows concurrent requests.
-
----
-
-## 🐳 Docker (Optional)
+## 🧪 Testing
 
 ```bash
-docker build -t rag-api .
-docker run -p 8000:8000 rag-api
+pytest
 ```
 
-Docker Compose support can be added for:
+---
 
-* GPU
-* Redis cache
-* external vector stores
+## 📈 Performance & Scaling Ideas
+
+- GPU acceleration (FAISS‑GPU, CUDA‑enabled inference)
+- Result caching (Redis)
+- Streaming responses
+- Multi‑index or multi‑tenant vector stores
 
 ---
 
-## 📌 Use Cases
+## 🔐 Production Notes
 
-* Internal knowledge assistants
-* Document Q&A systems
-* RAG-powered chatbots
-* AI search APIs
-* LLM experimentation with full data control
-
----
-
-## 🔮 Roadmap
-
-* ⚡ Streaming responses (token-by-token)
-* 🧵 Concurrency limiter (Semaphore)
-* 🛡️ Hallucination confidence scoring
-* 💾 Redis caching
-* 🐳 GPU-optimized Docker Compose
+- Add authentication (JWT / API keys)
+- Enable request rate limiting
+- Monitor latency and memory usage
+- Use persistent volumes for FAISS indexes
 
 ---
 
-## 🧠 Philosophy
+## 🤝 Contributing
 
-> **LLMs should answer only what your data allows them to answer.**
+Contributions are welcome!
 
-This project focuses on **correctness, observability, and control** rather than raw generation.
+1. Fork the repo
+2. Create a feature branch
+3. Commit your changes
+4. Open a pull request
 
 ---
 
-## 📄 License
+## 📜 License
 
-MIT License
+This project is licensed under the **MIT License**.
 
+---
+
+## 👤 Author
+
+**Denys Zakharov**  
+GitHub: https://github.com/DenysZakharovGH
+
+---
